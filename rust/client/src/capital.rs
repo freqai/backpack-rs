@@ -9,13 +9,13 @@ use bpx_api_types::{
 use crate::BpxClient;
 
 impl BpxClient {
-    pub async fn get_balances(&self) -> Result<HashMap<String, Balance>> {
+    pub  fn get_balances(&self) -> Result<HashMap<String, Balance>> {
         let url = format!("{}/api/v1/capital", self.base_url);
-        let res = self.get(url).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.get(url)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn get_deposits(
+    pub  fn get_deposits(
         &self,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -26,20 +26,20 @@ impl BpxClient {
                 url.push_str(&format!("&{}={}", k, v));
             }
         }
-        let res = self.get(url).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.get(url)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn get_deposit_address(&self, blockchain: Blockchain) -> Result<DepositAddress> {
+    pub  fn get_deposit_address(&self, blockchain: Blockchain) -> Result<DepositAddress> {
         let url = format!(
             "{}/wapi/v1/capital/deposit/address?blockchain={}",
             self.base_url, blockchain
         );
-        let res = self.get(url).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.get(url)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn get_withdrawals(
+    pub  fn get_withdrawals(
         &self,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -50,12 +50,12 @@ impl BpxClient {
                 url.push_str(&format!("{}={}&", k, v));
             }
         }
-        let res = self.get(url).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.get(url)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn request_withdrawal(&self, payload: RequestWithdrawalPayload) -> Result<()> {
+    pub  fn request_withdrawal(&self, payload: RequestWithdrawalPayload) -> Result<()> {
         let endpoint = format!("{}/wapi/v1/capital/withdrawals", self.base_url);
-        self.post(endpoint, payload).await.map(|_| ())
+        self.post(endpoint, payload).map(|_| ())
     }
 }

@@ -6,7 +6,7 @@ use crate::error::{Error, Result};
 use crate::BpxClient;
 
 impl BpxClient {
-    pub async fn get_open_order(
+    pub  fn get_open_order(
         &self,
         symbol: &str,
         order_id: Option<&str>,
@@ -23,17 +23,17 @@ impl BpxClient {
                 ))?
             ));
         }
-        let res = self.get(url).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.get(url)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn execute_order(&self, payload: ExecuteOrderPayload) -> Result<Order> {
+    pub  fn execute_order(&self, payload: ExecuteOrderPayload) -> Result<Order> {
         let endpoint = format!("{}/api/v1/order", self.base_url);
-        let res = self.post(endpoint, payload).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.post(endpoint, payload)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn cancel_order(
+    pub  fn cancel_order(
         &self,
         symbol: &str,
         order_id: Option<&str>,
@@ -46,22 +46,22 @@ impl BpxClient {
             client_id,
         };
 
-        let res = self.delete(url, payload).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.delete(url, payload)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn get_open_orders(&self, symbol: Option<&str>) -> Result<Vec<Order>> {
+    pub  fn get_open_orders(&self, symbol: Option<&str>) -> Result<Vec<Order>> {
         let mut url = format!("{}/api/v1/orders", self.base_url);
         if let Some(s) = symbol {
             url.push_str(&format!("?symbol={s}"));
         }
-        let res = self.get(url).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.get(url)?;
+        res.json().map_err(Into::into)
     }
 
-    pub async fn cancel_open_orders(&self, payload: CancelOpenOrdersPayload) -> Result<Vec<Order>> {
+    pub  fn cancel_open_orders(&self, payload: CancelOpenOrdersPayload) -> Result<Vec<Order>> {
         let url = format!("{}/api/v1/orders", self.base_url);
-        let res = self.delete(url, payload).await?;
-        res.json().await.map_err(Into::into)
+        let res = self.delete(url, payload)?;
+        res.json().map_err(Into::into)
     }
 }
