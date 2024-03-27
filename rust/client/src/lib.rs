@@ -146,9 +146,8 @@ impl BpxClient {
         let mut req = self.client.post(url).json(&payload).build()?;
         tracing::debug!("req: {:?}", req);
         self.sign(&mut req)?;
-        let response = self.client.execute(req)?;
-        let body_content = response.text()?;
-        println!(" payload body_content:{}\n", body_content);
+        self.client.execute(req).map_err(Error::from)
+
     }
 
     pub  fn delete<P: Serialize, U: IntoUrl>(&self, url: U, payload: P) -> Result<Response> {

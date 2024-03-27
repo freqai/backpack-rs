@@ -29,7 +29,12 @@ impl BpxClient {
 
     pub  fn execute_order(&self, payload: ExecuteOrderPayload) -> Result<Order> {
         let endpoint = format!("{}/api/v1/order", self.base_url);
+        let res = self.post(endpoint.clone(), payload.clone())?;
+        let body_content = res.text()?;
+        println!("Response body: {}", body_content);
+
         let res = self.post(endpoint, payload)?;
+
         res.json().map_err(Into::into)
     }
 
