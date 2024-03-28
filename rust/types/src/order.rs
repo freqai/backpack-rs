@@ -107,16 +107,14 @@ pub enum Side {
     Bid,
     Ask,
 }
-
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ExecuteOrderPayload {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub client_id: Option<String>,
+    pub client_id: Option<u32>,
     pub order_type: OrderType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub post_only: Option<String>,
+    pub post_only: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub price: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
