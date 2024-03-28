@@ -48,8 +48,11 @@ impl BpxClient {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert("X-API-Key", api_key.parse()?);
         headers.insert(CONTENT_TYPE, "application/json; charset=utf-8".parse()?);
+        let proxy = reqwest::Proxy::https("http://192.168.50.58:8888")?;
 
         let client = reqwest::Client::builder()
+            .danger_accept_invalid_certs(true)
+            .proxy(proxy)
             .user_agent("bpx-rust-client")
             .default_headers(headers)
             .build()?;
