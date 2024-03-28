@@ -30,7 +30,17 @@ impl BpxClient {
     pub async fn execute_order(&self, payload: ExecuteOrderPayload) -> Result<Order> {
         let endpoint = format!("{}/api/v1/order", self.base_url);
         let res = self.post(endpoint, payload).await?;
-        res.json().await.map_err(Into::into)
+
+        let text = res.text().await?;
+        // 然后尝试将文本内容解析为 JSON
+        match serde_json::from_str::<Order>(&text) {
+            Ok(order) => Ok(order), // 如果成功解析，返回 Order
+            Err(e) => {
+                println!("Failed to parse JSON: {}", e);
+                println!("Response text: {}", text);
+                Err(e.into()) // 将解析错误转换为合适的错误类型
+            }
+        }
     }
 
     pub async fn cancel_order(
