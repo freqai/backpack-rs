@@ -1,10 +1,7 @@
 use base64::{engine::general_purpose::STANDARD, Engine};
 use ed25519_dalek::{Signature, Signer, SigningKey, VerifyingKey};
 pub use error::{Error, Result};
-use reqwest::blocking::Response;
-use reqwest::blocking::Request;
-
-use reqwest::{header::CONTENT_TYPE, IntoUrl,Method  };
+use reqwest::{header::CONTENT_TYPE, IntoUrl, Method, Request, Response};
 use serde::Serialize;
 use std::collections::BTreeMap;
 
@@ -23,11 +20,11 @@ pub struct BpxClient {
     pub verifier: VerifyingKey,
     signer: SigningKey,
     base_url: String,
-    pub client: reqwest::blocking::Client,
+    pub client: reqwest::Client,
 }
 
 impl std::ops::Deref for BpxClient {
-    type Target = reqwest::blocking::Client;
+    type Target = reqwest::Client;
 
     fn deref(&self) -> &Self::Target {
         &self.client
@@ -40,8 +37,8 @@ impl std::ops::DerefMut for BpxClient {
     }
 }
 
-impl AsRef<reqwest::blocking::Client> for BpxClient {
-    fn as_ref(&self) -> &reqwest::blocking::Client {
+impl AsRef<reqwest::Client> for BpxClient {
+    fn as_ref(&self) -> &reqwest::Client {
         &self.client
     }
 }
@@ -52,7 +49,7 @@ impl BpxClient {
         headers.insert("X-API-Key", api_key.parse()?);
         headers.insert(CONTENT_TYPE, "application/json; charset=utf-8".parse()?);
 
-        let client = reqwest::blocking::Client::builder()
+        let client = reqwest::Client::builder()
             .user_agent("bpx-rust-client")
             .default_headers(headers)
             .build()?;
@@ -135,25 +132,36 @@ impl BpxClient {
         Ok(())
     }
 
-    pub  fn get<U: IntoUrl>(&self, url: U) -> Result<Response> {
+    pub async fn get<U: IntoUrl>(&self, url: U) -> Result<Response> {
         let mut req = self.client.get(url).build()?;
         tracing::debug!("req: {:?}", req);
         self.sign(&mut req)?;
-        self.client.execute(req).map_err(Error::from)
+        self.client
+            .execute(req)
+            .await
+            .and_then(|r| r.error_for_status())
+            .map_err(Error::from)
     }
 
-    pub  fn post<P: Serialize, U: IntoUrl>(&self, url: U, payload: P) -> Result<Response> {
+    pub async fn post<P: Serialize, U: IntoUrl>(&self, url: U, payload: P) -> Result<Response> {
         let mut req = self.client.post(url).json(&payload).build()?;
         tracing::debug!("req: {:?}", req);
         self.sign(&mut req)?;
-        self.client.execute(req).map_err(Error::from)
-
+        self.client
+            .execute(req)
+            .await
+            .and_then(|r| r.error_for_status())
+            .map_err(Error::from)
     }
 
-    pub  fn delete<P: Serialize, U: IntoUrl>(&self, url: U, payload: P) -> Result<Response> {
+    pub async fn delete<P: Serialize, U: IntoUrl>(&self, url: U, payload: P) -> Result<Response> {
         let mut req = self.client.delete(url).json(&payload).build()?;
         tracing::debug!("req: {:?}", req);
         self.sign(&mut req)?;
-        self.client.execute(req).map_err(Error::from)
+        self.client
+            .execute(req)
+            .await
+            .and_then(|r| r.error_for_status())
+            .map_err(Error::from)
     }
 }

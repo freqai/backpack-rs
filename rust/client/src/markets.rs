@@ -6,31 +6,31 @@ use crate::error::Result;
 use crate::BpxClient;
 
 impl BpxClient {
-    pub  fn get_assets(&self) -> Result<HashMap<String, Vec<Token>>> {
+    pub async fn get_assets(&self) -> Result<HashMap<String, Vec<Token>>> {
         let url = format!("{}/api/v1/assets", self.base_url);
-        let res = self.get(url)?;
-        res.json().map_err(Into::into)
+        let res = self.get(url).await?;
+        res.json().await.map_err(Into::into)
     }
 
-    pub  fn get_markets(&self) -> Result<Vec<Market>> {
+    pub async fn get_markets(&self) -> Result<Vec<Market>> {
         let url = format!("{}/api/v1/markets", self.base_url);
-        let res = self.get(url)?;
-        res.json().map_err(Into::into)
+        let res = self.get(url).await?;
+        res.json().await.map_err(Into::into)
     }
 
-    pub  fn get_ticker(&self, symbol: &str) -> Result<Vec<Ticker>> {
+    pub async fn get_ticker(&self, symbol: &str) -> Result<Vec<Ticker>> {
         let url = format!("{}/api/v1/ticker&symbol={}", self.base_url, symbol);
-        let res = self.get(url)?;
-        res.json().map_err(Into::into)
+        let res = self.get(url).await?;
+        res.json().await.map_err(Into::into)
     }
 
-    pub  fn get_order_book_depth(&self, symbol: &str) -> Result<OrderBookDepth> {
+    pub async fn get_order_book_depth(&self, symbol: &str) -> Result<OrderBookDepth> {
         let url = format!("{}/api/v1/depth&symbol={}", self.base_url, symbol);
-        let res = self.get(url)?;
-        res.json().map_err(Into::into)
+        let res = self.get(url).await?;
+        res.json().await.map_err(Into::into)
     }
 
-    pub  fn get_k_lines(
+    pub async fn get_k_lines(
         &self,
         symbol: &str,
         kline_interval: &str,
@@ -46,7 +46,7 @@ impl BpxClient {
                 url.push_str(&format!("&{}={}", k, v));
             }
         }
-        let res = self.get(url)?;
-        res.json().map_err(Into::into)
+        let res = self.get(url).await?;
+        res.json().await.map_err(Into::into)
     }
 }
