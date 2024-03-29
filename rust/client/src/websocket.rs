@@ -9,9 +9,9 @@ use tokio_tungstenite::WebSocketStream;
 use tokio_tungstenite::{connect_async, MaybeTlsStream};
 use url::Url;
 
-use crate::config::Config;
 use crate::errors::*;
-
+use base64::{engine::general_purpose::STANDARD, Engine};
+use ed25519_dalek::{Signature, Signer, SigningKey, VerifyingKey};
 
 #[derive(Serialize, Deserialize)]
 struct Subscription {
@@ -20,6 +20,7 @@ struct Subscription {
     signature: Vec<String>,
 }
 
+const SIGNING_WINDOW: u32 = 5000;
 
 
 pub fn order_update_stream() -> &'static str { "account.orderUpdatesd" }
@@ -29,32 +30,77 @@ pub fn book_ticker_stream(symbol: &str) -> String { format!("bookTicker.{symbol}
 pub struct WebSockets<'a, WE> {
     pub socket: Option<(WebSocketStream<MaybeTlsStream<TcpStream>>, Response)>,
     handler: Box<dyn FnMut(WE) -> Result<()> + 'a + Send>,
-    conf: Config,
+    api_key: &str,
+    api_secret: &str,
 }
 
 impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
     /// New websocket holder with default configuration
     /// # Examples
     /// see examples/binance_websockets.rs
-    pub fn new<Callback>(handler: Callback) -> WebSockets<'a, WE>
+    pub fn new<Callback>(handler: Callback, api_key: &str, api_secret: &str) -> WebSockets<'a, WE>
     where
         Callback: FnMut(WE) -> Result<()> + 'a + Send,
     {
-        Self::new_with_options(handler, Config::default())
+        Self::new_with_options(handler, api_key , api_secret )
     }
 
     /// New websocket holder with provided configuration
     /// # Examples
     /// see examples/binance_websockets.rs
-    pub fn new_with_options<Callback>(handler: Callback, conf: Config) -> WebSockets<'a, WE>
+    pub fn new_with_options<Callback>(handler: Callback, api_key: &str, api_secret: &str) -> WebSockets<'a, WE>
     where
         Callback: FnMut(WE) -> Result<()> + 'a + Send,
     {
         WebSockets {
             socket: None,
             handler: Box::new(handler),
-            conf,
+            api_key:api_key,
+            api_secret:api_secret,
         }
+    }
+
+    fn sign(&self, endpoint: &str) -> Result<Vec<String>> {
+        let instruction = "subscribe";
+
+        if endpoint == "account.orderUpdate" {
+
+            
+
+            let timestamp = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)?
+                .as_millis();
+
+        
+            let api_secret = STANDARD
+                .decode(self.api_secret)?
+                .try_into()
+                .map_err(|_| Error::SecretKey)?;
+        
+            let signer = SigningKey::from_bytes(&api_secret);
+            let verifier = signer.verifying_key();
+
+            let mut signee = format!("instruction={instruction}");
+        
+            signee.push_str(&format!("&method=SUBSCRIBE"));
+            signee.push_str(&format!("&params={endpoint}"));
+            signee.push_str(&format!("&timestamp={timestamp}&window={SIGNING_WINDOW}"));
+            tracing::debug!("signee: {}", signee);
+
+            let signature: Signature = signer.sign(signee.as_bytes());
+            let signature = STANDARD.encode(signature.to_bytes());
+
+        Ok(vec![
+                self.api_key.to_string(),
+                signature.parse()?,
+                timestamp.to_string().parse()?,
+                SIGNING_WINDOW.to_string().parse()?,
+            ]);
+            
+        }
+
+        Ok(vec![]);
+
     }
 
     
@@ -63,9 +109,9 @@ impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
         let wss: String = format!("{}", "wss://ws.backpack.exchange");
         let url = Url::parse(&wss)?;
 
-        self.handle_connect(url).await
+        self.handle_connect(url,endpoint).await
     } 
-    async fn handle_connect(&mut self, url: Url) -> Result<()> {
+    async fn handle_connect(&mut self, url: Url,endpoint: &str) -> Result<()> {
         match connect_async(url).await {
             Ok(answer) => {
                 self.socket = Some(answer);
@@ -73,13 +119,8 @@ impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
                 // 创建订阅消息
                 let subscribe_message = Subscription {
                     method: "SUBSCRIBE".to_string(),
-                    params: vec!["stream".to_string()],
-                    signature: vec![
-                        "<verifying key>".to_string(),
-                        "<signature>".to_string(),
-                        "<timestamp>".to_string(),
-                        "<window>".to_string(),
-                    ],
+                    params: vec![endpoint.to_string()],
+                    signature: self.sign(endpoint).unwrap(),
                 };
 
                 // 序列化订阅消息为JSON字符串
@@ -89,9 +130,6 @@ impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
                 if let Some(ref mut socket) = self.socket {
                     socket.send(Message::Text(message)).await?;
                 }
-
-
-
                 
                 Ok(())
             }
