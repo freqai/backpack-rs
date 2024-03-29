@@ -4,6 +4,7 @@ pub use error::{Error, Result};
 use reqwest::{header::CONTENT_TYPE, IntoUrl, Method, Request, Response};
 use serde::Serialize;
 use std::collections::BTreeMap;
+use std::env;
 
 pub use bpx_api_types as types;
 
@@ -50,12 +51,21 @@ impl BpxClient {
         headers.insert(CONTENT_TYPE, "application/json; charset=utf-8".parse()?);
        // let proxy = reqwest::Proxy::https("http://192.168.50.58:8888")?;
 
-        let client = reqwest::Client::builder()
+       let mut client_builder = reqwest::Client::builder()
             //.danger_accept_invalid_certs(true)
            // .proxy(proxy)
             .user_agent("bpx-rust-client")
-            .default_headers(headers)
-            .build()?;
+            .default_headers(headers);
+        
+
+            // 检查环境变量来决定是否启用代理
+        if let Ok(proxy_url) = env::var("HTTP_PROXY") {
+            let proxy = reqwest::Proxy::all(&proxy_url)?;
+            client_builder = client_builder.danger_accept_invalid_certs(true).proxy(proxy);
+        }
+
+        let client = client_builder.build()?;
+
 
         let api_secret = STANDARD
             .decode(api_secret)?
