@@ -13,6 +13,8 @@ pub mod error;
 pub mod markets;
 pub mod order;
 pub mod trades;
+pub mod websockets;
+pub mod ws_model;
 
 const SIGNING_WINDOW: u32 = 5000;
 

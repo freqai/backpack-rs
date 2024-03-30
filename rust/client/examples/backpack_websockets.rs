@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate tokio;
-use binance::websockets::*;
+use bpx_api_client::websockets::*;
+use bpx_api_client::ws_model::{CombinedStreamEvent, WebsocketEvent, WebsocketEventUntag};
 
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -40,7 +41,6 @@ async fn main() {
         }
     }
 }
-
 
 
 #[allow(dead_code)]
