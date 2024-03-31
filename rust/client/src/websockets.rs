@@ -156,7 +156,7 @@ impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
                 // 发送订阅消息
                 if let Some(ref mut socketw) = self.socket {
 
-                    println!("send message :{}",message);
+                    //println!("send message :{}",message);
 
                     socketw.0.send(Message::Text(message)).await?;
 
@@ -197,13 +197,13 @@ impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
                         if msg.is_empty() {
                             return Ok(());
                         }
-                        println!("receive message :{}",msg.as_str());
+                       // println!("receive message :{}",msg.as_str());
 
                         let event: WE = from_str(msg.as_str())?;
-                        println!("from_str");
+                       // println!("from_str");
 
                         (self.handler)(event)?;
-                        println!("handler");
+                       // println!("handler");
 
                     }
                     Message::Ping(_) | Message::Pong(_) | Message::Binary(_) | Message::Frame(_) => {}
