@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use bpx_api_types::markets::{Kline, Market, OrderBookDepth, Ticker, Token};
+use backpack_types::markets::{Kline, Market, OrderBookDepth, Ticker, Token};
 
 use crate::error::Result;
 use crate::BpxClient;

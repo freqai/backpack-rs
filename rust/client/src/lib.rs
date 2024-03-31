@@ -6,7 +6,7 @@ use serde::Serialize;
 use std::collections::BTreeMap;
 use std::env;
 
-pub use bpx_api_types as types;
+pub use backpack_types as types;
 
 pub mod capital;
 pub mod error;

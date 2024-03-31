@@ -1,4 +1,4 @@
-use bpx_api_types::order::{
+use backpack_types::order::{
     CancelOpenOrdersPayload, CancelOrderPayload, ExecuteOrderPayload, Order,
 };
 

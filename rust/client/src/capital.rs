@@ -1,7 +1,7 @@
 use crate::error::Result;
 use std::collections::HashMap;
 
-use bpx_api_types::{
+use backpack_types::{
     capital::{Balance, Deposit, DepositAddress, RequestWithdrawalPayload, Withdrawal},
     Blockchain,
 };

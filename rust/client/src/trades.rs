@@ -1,4 +1,4 @@
-use bpx_api_types::trade::Trade;
+use backpack_types::trade::Trade;
 
 use crate::error::Result;
 use crate::BpxClient;
