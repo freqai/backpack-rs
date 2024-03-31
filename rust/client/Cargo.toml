@@ -1,5 +1,5 @@
 [package]
-name = "bpx-api-client"
+name = "backpack-rs"
 authors = ["Backpack <security@backpack.exchange>"]
 license = "Apache-2.0"
 version = "0.1.4"
@@ -7,15 +7,21 @@ edition = "2021"
 description = "Rust client for Backpack Exchange"
 
 [dependencies]
+chrono = { version = "0.4", features = ["serde"] }
 base64 = { workspace = true }
 bpx-api-types = { version = "0.1.1", path = "../types" }
 ed25519-dalek = { workspace = true }
 reqwest = { workspace = true }
 rust_decimal = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_qs = "0.12"
+serde_repr = "0.1"
 thiserror = { workspace = true }
 tracing = { workspace = true }
+futures = "0.3"
+url = "2.5"
+futures-util = "0.3"
 
-tokio-tungstenite = "0.21"
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
 tokio = { version = "1.36", features = ["full"] }

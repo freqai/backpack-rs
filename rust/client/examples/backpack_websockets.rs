@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate tokio;
-use bpx_api_client::websockets::*;
-use bpx_api_client::ws_model::{CombinedStreamEvent, WebsocketEvent, WebsocketEventUntag};
+use backpack_rs::websockets::*;
+use backpack_rs::ws_model::{WebsocketEvent, WebsocketEventUntag};
+use futures::future::BoxFuture;
 
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool};
 
 use tokio::sync::mpsc::UnboundedSender;
-use tokio_tungstenite::tungstenite::Message;
 
 
 #[tokio::main]
@@ -46,7 +46,7 @@ async fn main() {
 #[allow(dead_code)]
 async fn book_ticker(logger_tx: UnboundedSender<WebsocketEvent>) {
     let keep_running = AtomicBool::new(true);
-    let book_ticker: String = book_ticker_stream("btcusdt");
+    let book_ticker: String = book_ticker_stream("WIF_USDC");
 
     let mut web_socket: WebSockets<'_, WebsocketEventUntag> = WebSockets::new(|events: WebsocketEventUntag| {
         if let WebsocketEventUntag::WebsocketEvent(we) = &events {
@@ -56,7 +56,7 @@ async fn book_ticker(logger_tx: UnboundedSender<WebsocketEvent>) {
             println!("{tick_event:?}")
         }
         Ok(())
-    });
+    }, "yQ3SUCT9hfYEvj0y/myaVc7IEqB8VKRdDozqt3pFBQg=","uJOx7uP5LOn9FTFycUmSGQumwoCzOhgVlQnwvNyeOTU=" );
 
     web_socket.connect(&book_ticker).await.unwrap(); // check error
     if let Err(e) = web_socket.event_loop(&keep_running).await {

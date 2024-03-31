@@ -1,4 +1,8 @@
-use crate::rest_model::{string_or_float, Asks, Bids, ExecutionType, OrderBook, OrderSide, OrderStatus, OrderType, TimeInForce};
+use serde::Serialize;
+use serde::Deserialize;
+
+use crate::rest_model::string_or_float;
+use crate::rest_model::{Asks, Bids, ExecutionType, OrderBook, OrderSide, OrderStatus, OrderType, TimeInForce};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "e")]
@@ -249,8 +253,16 @@ pub struct DepthOrderBookEvent {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct BookTickerEvent {
-    #[serde(rename = "u")]
-    pub update_id: u64,
+    #[serde(rename = "e")]
+    pub stream: String,
+    #[serde(rename = "E")]
+    pub eventtime: i64,
+    #[serde(rename = "T")]
+    pub enginetime: i64,
+
+
+    #[serde(rename = "u", with = "string_or_float")]
+    pub update_id: f64,
 
     #[serde(rename = "s")]
     pub symbol: String,
