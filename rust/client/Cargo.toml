@@ -9,7 +9,7 @@ description = "Rust client for Backpack Exchange"
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 base64 = { workspace = true }
-bpx-api-types = { version = "0.1.1", path = "../types" }
+backpack-types = { version = "0.1.1", path = "../types" }
 ed25519-dalek = { workspace = true }
 reqwest = { workspace = true }
 rust_decimal = { workspace = true }
