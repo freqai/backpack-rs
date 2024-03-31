@@ -254,31 +254,38 @@ pub struct DepthOrderBookEvent {
 #[serde(rename_all = "camelCase")]
 pub struct BookTickerEvent {
     #[serde(rename = "e")]
-    pub stream: String,
+    pub ename: String,
     #[serde(rename = "E")]
     pub eventtime: i64,
     #[serde(rename = "T")]
     pub enginetime: i64,
 
 
-    #[serde(rename = "u", with = "string_or_float")]
-    pub update_id: f64,
+    #[serde(rename = "u" )]
+    pub update_id: u64,
 
     #[serde(rename = "s")]
     pub symbol: String,
 
-    #[serde(rename = "b", with = "string_or_float")]
+    #[serde(rename = "b", with = "string_or_float" )]
     pub best_bid: f64,
 
-    #[serde(rename = "B", with = "string_or_float")]
+    #[serde(rename = "B" , with = "string_or_float")]
     pub best_bid_qty: f64,
 
-    #[serde(rename = "a", with = "string_or_float")]
+    #[serde(rename = "a", with = "string_or_float" )]
     pub best_ask: f64,
 
-    #[serde(rename = "A", with = "string_or_float")]
+    #[serde(rename = "A", with = "string_or_float" )]
     pub best_ask_qty: f64,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct BookTickerDataEvent {
+    pub data: BookTickerEvent,
+    pub stream: String,
+}
+
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -310,6 +317,12 @@ pub struct CombinedStreamEvent<T> {
     stream: String,
     pub data: T,
 }
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct WebsocketData<T> {
+    pub data: T,
+    pub stream: String,
+}
+
 
 ///
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -317,7 +330,7 @@ pub struct CombinedStreamEvent<T> {
 pub enum WebsocketEventUntag {
     WebsocketEvent(WebsocketEvent),
     Orderbook(Box<OrderBook>),
-    BookTicker(Box<BookTickerEvent>),
+    BookTickerDataEvent(Box<BookTickerDataEvent>),
 }
 
 impl<T> CombinedStreamEvent<T> {
@@ -407,6 +420,57 @@ pub struct BalanceUpdate {
     #[serde(alias = "T")]
     pub clear_time: u64,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OrderEvent {
+    #[serde(rename = "e")]
+    pub event_type: String,
+    #[serde(rename = "E")]
+    pub event_time: u64,
+    #[serde(rename = "s")]
+    pub symbol: String,
+    #[serde(rename = "c")]
+    pub client_order_id: String,
+    #[serde(rename = "S")]
+    pub side: String,
+    #[serde(rename = "o")]
+    pub order_type: String,
+    #[serde(rename = "f")]
+    pub time_in_force: String,
+    #[serde(rename = "q")]
+    pub quantity: String,
+    #[serde(rename = "Q")]
+    pub quantity_in_quote: String,
+    #[serde(rename = "p")]
+    pub price: String,
+    #[serde(rename = "P")]
+    pub trigger_price: String,
+    #[serde(rename = "X")]
+    pub order_state: String,
+    #[serde(rename = "i")]
+    pub order_id: String,
+    #[serde(rename = "t")]
+    pub trade_id: String,
+    #[serde(rename = "l")]
+    pub fill_quantity: String,
+    #[serde(rename = "z")]
+    pub executed_quantity: String,
+    #[serde(rename = "Z")]
+    pub executed_quantity_in_quote: String,
+    #[serde(rename = "L")]
+    pub fill_price: String,
+    #[serde(rename = "m")]
+    pub was_maker: bool,
+    #[serde(rename = "n")]
+    pub fee: String,
+    #[serde(rename = "N")]
+    pub fee_symbol: String,
+    #[serde(rename = "V")]
+    pub self_trade_prevention: String,
+    #[serde(rename = "T")]
+    pub engine_timestamp: u64,
+}
+
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]

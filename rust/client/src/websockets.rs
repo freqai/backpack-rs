@@ -33,7 +33,7 @@ struct SubscriptionPub {
 const SIGNING_WINDOW: u32 = 5000;
 
 
-pub fn order_update_stream() -> &'static str { "account.orderUpdatesd" }
+pub fn order_update_stream()  -> String{ "account.orderUpdate".to_string() }
 pub fn book_ticker_stream(symbol: &str) -> String { format!("bookTicker.{symbol}") }
 
 
@@ -93,8 +93,8 @@ impl<'a, WE: serde::de::DeserializeOwned> WebSockets<'a, WE> {
 
             let mut signee = format!("instruction={instruction}");
         
-            signee.push_str(&format!("&method=SUBSCRIBE"));
-            signee.push_str(&format!("&params={endpoint}"));
+            //signee.push_str(&format!("&method=SUBSCRIBE"));
+           // signee.push_str(&format!("&params={endpoint}"));
             signee.push_str(&format!("&timestamp={timestamp}&window={SIGNING_WINDOW}"));
             tracing::debug!("signee: {}", signee);
 

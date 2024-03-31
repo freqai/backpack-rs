@@ -24,7 +24,8 @@ async fn main() {
     });
     let streams: Vec<BoxFuture<'static, ()>> = vec![
         
-        Box::pin(book_ticker(logger_tx.clone())),
+    //Box::pin(book_ticker(logger_tx.clone())),
+    Box::pin(order_update(logger_tx.clone())),
        
     ];
 
@@ -52,13 +53,37 @@ async fn book_ticker(logger_tx: UnboundedSender<WebsocketEvent>) {
         if let WebsocketEventUntag::WebsocketEvent(we) = &events {
             logger_tx.send(we.clone()).unwrap();
         }
-        if let WebsocketEventUntag::BookTicker(tick_event) = events {
+        if let WebsocketEventUntag::BookTickerDataEvent(tick_event) = events {
             println!("{tick_event:?}")
         }
         Ok(())
     }, "yQ3SUCT9hfYEvj0y/myaVc7IEqB8VKRdDozqt3pFBQg=","uJOx7uP5LOn9FTFycUmSGQumwoCzOhgVlQnwvNyeOTU=" );
 
     web_socket.connect(&book_ticker).await.unwrap(); // check error
+    if let Err(e) = web_socket.event_loop(&keep_running).await {
+        println!("Error: {e}");
+    }
+    web_socket.disconnect().await.unwrap();
+    println!("disconnected");
+}
+
+
+#[allow(dead_code)]
+async fn order_update(logger_tx: UnboundedSender<WebsocketEvent>) {
+    let keep_running = AtomicBool::new(true);
+    let order_update: String = order_update_stream();
+
+    let mut web_socket: WebSockets<'_, WebsocketEventUntag> = WebSockets::new(|events: WebsocketEventUntag| {
+        if let WebsocketEventUntag::WebsocketEvent(we) = &events {
+            logger_tx.send(we.clone()).unwrap();
+        }
+        if let WebsocketEventUntag::BookTickerDataEvent(tick_event) = events {
+            println!("{tick_event:?}")
+        }
+        Ok(())
+    }, "yQ3SUCT9hfYEvj0y/myaVc7IEqB8VKRdDozqt3pFBQg=","uJOx7uP5LOn9FTFycUmSGQumwoCzOhgVlQnwvNyeOTU=" );
+
+    web_socket.connect(&order_update).await.unwrap(); // check error
     if let Err(e) = web_socket.event_loop(&keep_running).await {
         println!("Error: {e}");
     }
