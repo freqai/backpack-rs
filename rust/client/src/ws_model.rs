@@ -329,8 +329,8 @@ pub struct WebsocketData<T> {
 #[serde(untagged)]
 pub enum WebsocketEventUntag {
     WebsocketEvent(WebsocketEvent),
-    Orderbook(Box<OrderBook>),
     BookTickerDataEvent(Box<BookTickerDataEvent>),
+    OrderDataEvent(Box<OrderDataEvent>),
 }
 
 impl<T> CombinedStreamEvent<T> {
@@ -421,55 +421,66 @@ pub struct BalanceUpdate {
     pub clear_time: u64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrderEvent {
     #[serde(rename = "e")]
-    pub event_type: String,
+    pub event_type: Option<String>,
     #[serde(rename = "E")]
-    pub event_time: u64,
+    pub event_time: Option<u64>,
     #[serde(rename = "s")]
-    pub symbol: String,
+    pub symbol: Option<String>,
     #[serde(rename = "c")]
-    pub client_order_id: String,
+    pub client_order_id: Option<String>,
     #[serde(rename = "S")]
-    pub side: String,
+    pub side: Option<String>,
     #[serde(rename = "o")]
-    pub order_type: String,
+    pub order_type: Option<String>,
     #[serde(rename = "f")]
-    pub time_in_force: String,
+    pub time_in_force: Option<String>,
     #[serde(rename = "q")]
-    pub quantity: String,
+    pub quantity: Option<String>,
     #[serde(rename = "Q")]
-    pub quantity_in_quote: String,
+    pub quantity_in_quote: Option<String>,
     #[serde(rename = "p")]
-    pub price: String,
+    pub price: Option<String>,
     #[serde(rename = "P")]
-    pub trigger_price: String,
+    pub trigger_price: Option<String>,
     #[serde(rename = "X")]
-    pub order_state: String,
+    pub order_state: Option<String>,
     #[serde(rename = "i")]
-    pub order_id: String,
+    pub order_id: Option<String>,
     #[serde(rename = "t")]
-    pub trade_id: String,
+    pub trade_id: Option<u64>, // Use Option to handle null values.
     #[serde(rename = "l")]
-    pub fill_quantity: String,
+    pub fill_quantity: Option<String>,
     #[serde(rename = "z")]
-    pub executed_quantity: String,
+    pub executed_quantity: Option<String>,
     #[serde(rename = "Z")]
-    pub executed_quantity_in_quote: String,
+    pub executed_quantity_in_quote: Option<String>,
     #[serde(rename = "L")]
-    pub fill_price: String,
+    pub fill_price: Option<String>,
     #[serde(rename = "m")]
-    pub was_maker: bool,
+    pub was_maker: Option<bool>,
     #[serde(rename = "n")]
-    pub fee: String,
+    pub fee: Option<String>,
     #[serde(rename = "N")]
-    pub fee_symbol: String,
+    pub fee_symbol: Option<String>,
     #[serde(rename = "V")]
-    pub self_trade_prevention: String,
+    pub self_trade_prevention: Option<String>,
     #[serde(rename = "T")]
-    pub engine_timestamp: u64,
+    pub engine_timestamp: Option<u64>,
 }
+
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct OrderDataEvent {
+    pub data: OrderEvent,
+    pub stream: String,
+}
+
+
 
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

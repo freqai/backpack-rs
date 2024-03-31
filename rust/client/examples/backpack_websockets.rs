@@ -77,7 +77,7 @@ async fn order_update(logger_tx: UnboundedSender<WebsocketEvent>) {
         if let WebsocketEventUntag::WebsocketEvent(we) = &events {
             logger_tx.send(we.clone()).unwrap();
         }
-        if let WebsocketEventUntag::BookTickerDataEvent(tick_event) = events {
+        if let WebsocketEventUntag::OrderDataEvent(tick_event) = events {
             println!("{tick_event:?}")
         }
         Ok(())

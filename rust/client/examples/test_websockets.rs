@@ -8,7 +8,7 @@ fn process_message<WE: DeserializeOwned>(msg: &str) -> Result<WE, serde_json::Er
 }
 
 fn main() {
-    let json_data: &str = r#"{"data":{"A":"274.5","B":"272.0","E":1711867343981688,"T":1711867343980962,"a":"4.4030","b":"4.4029","e":"bookTicker","s":"WIF_USDC","u":161567336},"stream":"bookTicker.WIF_USDC"}"#;
+    let json_data: &str = r#"{"data":{"E":1711899660078481,"S":"Bid","T":1711899660077996,"V":"RejectTaker","X":"New","Z":"0","e":"orderAccepted","f":"GTC","i":"112191056122806272","o":"LIMIT","p":"4.6771","q":"10.8","s":"WIF_USDC","t":null,"z":"0"},"stream":"account.orderUpdate"}"#;
 
 
 
