@@ -1,5 +1,5 @@
 [package]
-name = "bpx-api-types"
+name = "backpack-types"
 authors = ["Backpack <security@backpack.exchange>"]
 license = "Apache-2.0"
 version = "0.1.1"
