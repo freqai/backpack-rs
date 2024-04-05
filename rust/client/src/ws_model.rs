@@ -446,7 +446,7 @@ pub struct OrderEvent {
     #[serde(rename = "P")]
     pub trigger_price: Option<String>,
     #[serde(rename = "X")]
-    pub order_state: Option<String>,
+    pub order_state: OrderStatus,
     #[serde(rename = "i")]
     pub order_id: Option<String>,
     #[serde(rename = "t")]

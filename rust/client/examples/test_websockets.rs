@@ -1,4 +1,4 @@
-use backpack_rs::ws_model::{WebsocketEvent, WebsocketEventUntag};
+use backpack_client::ws_model::{WebsocketEvent, WebsocketEventUntag};
 use serde::de::DeserializeOwned;
 use serde_json::from_str;
 

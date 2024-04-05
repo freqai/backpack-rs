@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate tokio;
-use backpack_rs::websockets::*;
-use backpack_rs::ws_model::{WebsocketEvent, WebsocketEventUntag};
+use backpack_client::websockets::*;
+use backpack_client::ws_model::{WebsocketEvent, WebsocketEventUntag};
 use futures::future::BoxFuture;
 
 use std::sync::atomic::{AtomicBool};
