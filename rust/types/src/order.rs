@@ -15,7 +15,6 @@ pub struct MarketOrder {
     pub executed_quote_quantity: Decimal,
     pub trigger_price: Option<Decimal>,
     pub time_in_force: TimeInForce,
-    pub self_trade_prevention: SelfTradePrevention,
     pub status: OrderStatus,
     pub created_at: i64,
 }
@@ -33,7 +32,6 @@ pub struct LimitOrder {
     pub price: Decimal,
     pub trigger_price: Option<Decimal>,
     pub time_in_force: TimeInForce,
-    pub self_trade_prevention: SelfTradePrevention,
     pub post_only: bool,
     pub status: OrderStatus,
     pub created_at: i64,
@@ -122,8 +120,7 @@ pub struct ExecuteOrderPayload {
     pub quantity: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quote_quantity: Option<Decimal>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub self_trade_prevention: Option<SelfTradePrevention>,
+   
     pub side: Side,
     pub symbol: String,
     #[serde(skip_serializing_if = "Option::is_none")]
